@@ -3,7 +3,7 @@
 
 An experimental voxel engine.
 
-[Live demo of test app here!](http://andyhall.github.io/noa-testbed/)
+[Live demo of test app here!](https://andyhall.github.io/noa-testbed/)
 
 ### Usage
 
@@ -13,13 +13,15 @@ Under active development, best way to try it is to clone and hack on it:
 (clone this repo)
 cd noa
 npm install
-npm start       # runs /examples/hello-world
-npm test        # runs /examples/test
+npm start       # runs /docs/hello-world
+npm test        # runs /docs/test
 ```
 
-Here are live versions of the examples: 
- * [hello-world example](http://andyhall.github.io/noa/examples/hello-world/)
- * [test example](http://andyhall.github.io/noa/examples/test/)
+The `start` and `test` scripts assume that `webpack` and `webpack-dev-server` are installed globally via npm or yarn.
+
+Live versions of the test content: 
+ * [hello-world example](https://andyhall.github.io/noa/hello-world/)
+ * [test example](https://andyhall.github.io/noa/test/)
 
 To build a new world app, use `noa` as a dependency:
 
@@ -31,7 +33,7 @@ npm install --save noa-engine
 var engine = require('noa-engine')
 var noa = engine({
     inverseY: true,
-    // see source or examples for more options and usage
+    // see source or /docs/ examples for more options and usage
 })
 ```
 
@@ -56,9 +58,25 @@ the source.
 
 ### Recent changes:
 
+ * 0.24.0
+   * Terrain materials can specify a renderMaterial (see `registry.registerMaterial()`)
+   * Targeting and `noa.pick` can take a function for which block IDs to target - #36
+   * `every` component is removed (client apps using this, please define it separately)
+ * 0.23.0
+   * Now uses octrees for scene selection for all meshes, even moving ones
+   * Option `useOctreesForDynamicMeshes` (default `true`) to disable previous
+   * `noa.rendering.addDynamicMesh` changed to `addMeshToScene(mesh, isStatic)`
+   * Entities can now be cylindrical w.r.t. `collideEntities` component
+   * Adds pairwise entity collision handler `noa.entities.onPairwiseEntityCollision`
+ * 0.22.0
+   * Large/complicated scenes should mesh and render much faster
+   * Chunk terrain/object meshing now merges results. Block object meshes must be static!
+   * Removed redundant `player` component - use `noa.playerEntity` property
+   * Added `showFPS` option
+   * Many internal changes that hopefully don't break compatibility
  * 0.21.0
    * Support unloading/reloading new world data.  
-     Sample implementation in the `examples/test` app (hit "O" to swap world data)
+     Sample implementation in the `docs/test` app (hit "O" to swap world data)
    * changes `noa.world#setChunkData` params: `id, array, userData`
    * changes `noa.world#chunkBeingRemoved` event params: `id, array, userData`
  * 0.20.0

@@ -3,7 +3,7 @@
 
 An experimental voxel engine.
 
-[Live demo of test app here!](http://andyhall.github.io/noa-testbed/)
+[Live demo of test app here!](https://andyhall.github.io/noa-testbed/)
 
 ### Usage
 
@@ -13,13 +13,15 @@ Under active development, best way to try it is to clone and hack on it:
 (clone this repo)
 cd noa
 npm install
-npm start       # runs /examples/hello-world
-npm test        # runs /examples/test
+npm start       # runs /docs/hello-world
+npm test        # runs /docs/test
 ```
 
-Here are live versions of the examples: 
- * [hello-world example](http://andyhall.github.io/noa/examples/hello-world/)
- * [test example](http://andyhall.github.io/noa/examples/test/)
+The `start` and `test` scripts assume that `webpack` and `webpack-dev-server` are installed globally via npm or yarn.
+
+Live versions of the test content: 
+ * [hello-world example](https://andyhall.github.io/noa/hello-world/)
+ * [test example](https://andyhall.github.io/noa/test/)
 
 To build a new world app, use `noa` as a dependency:
 
@@ -31,9 +33,21 @@ npm install --save noa-engine
 var engine = require('noa-engine')
 var noa = engine({
     inverseY: true,
-    // see source or examples for more options and usage
+    // see source or /docs/ examples for more options and usage
 })
 ```
+
+### Status, contributing, etc.
+
+This library attempts to be something you can build a voxel game on top of. 
+It's not a fully-featured game engine; it just tries to manage the painful parts 
+of using voxels (e.g. chunking, meshing), and certain things that are 
+tightly coupled to voxel implementation (e.g. physics), 
+and otherwise stay out of your way.
+
+Contributions are welcome! But please open an issue before building any 
+nontrivial new features. I want to keep this library lean if I can, 
+so if your idea could be done as a separate module then that's probably what I'll suggest.
 
 ### Docs
 
@@ -44,6 +58,27 @@ the source.
 
 ### Recent changes:
 
+ * 0.24.0
+   * Terrain materials can specify a renderMaterial (see `registry.registerMaterial()`)
+   * Targeting and `noa.pick` can take a function for which block IDs to target - #36
+   * `every` component is removed (client apps using this, please define it separately)
+ * 0.23.0
+   * Now uses octrees for scene selection for all meshes, even moving ones
+   * Option `useOctreesForDynamicMeshes` (default `true`) to disable previous
+   * `noa.rendering.addDynamicMesh` changed to `addMeshToScene(mesh, isStatic)`
+   * Entities can now be cylindrical w.r.t. `collideEntities` component
+   * Adds pairwise entity collision handler `noa.entities.onPairwiseEntityCollision`
+ * 0.22.0
+   * Large/complicated scenes should mesh and render much faster
+   * Chunk terrain/object meshing now merges results. Block object meshes must be static!
+   * Removed redundant `player` component - use `noa.playerEntity` property
+   * Added `showFPS` option
+   * Many internal changes that hopefully don't break compatibility
+ * 0.21.0
+   * Support unloading/reloading new world data.  
+     Sample implementation in the `docs/test` app (hit "O" to swap world data)
+   * changes `noa.world#setChunkData` params: `id, array, userData`
+   * changes `noa.world#chunkBeingRemoved` event params: `id, array, userData`
  * 0.20.0
    * Near chunks get loaded and distant ones get unloaded faster and more sensibly
    * Greatly speeds up chunk init, meshing, and disposal (and fixes some new Chrome deopts)
@@ -68,101 +103,7 @@ the source.
 
 ## Partial API reference:
 
-<!-- Start index.js -->
 
-## noa
-Main engine object.  
-Emits: *tick, beforeRender, afterRender, targetBlockChanged*
+(docs currently broken by some weird npm+markdox issue..)
 
-```js
-var noaEngine = require('noa-engine')
-var noa = noaEngine(opts)
-```
-
-* **playerEntity**  - Entity id for the player entity
-
-* **playerBody**  - reference to player entity's physics body
-
-* **setPaused (paused)**  - Pausing the engine will also stop render/tick events, etc.
-
-* **getBlock (x,y,z)** 
-
-* **setBlock (x,y,z)** 
-
-* **addBlock (id,x,y,z)**  - Adds a block unless obstructed by entities 
-
-* **getPlayerPosition()** 
-
-* **getPlayerMesh()** 
-
-* **setPlayerEyeOffset()** 
-
-* **getPlayerEyePosition()** 
-
-* **getCameraVector()** 
-
-* **pick (pos, vec, dist)**  - Raycast through the world, returning a result object for any non-air block
-
-<!-- End index.js -->
-
-----
-
-<!-- Start lib/entities.js -->
-
-## noa.entities
-Wrangles entities. 
-This class is an instance of [ECS](https://github.com/andyhall/ent-comp), 
-and as such implements the usual ECS methods.
-It's also decorated with helpers and accessor functions for getting component existence/state.
-
-Expects entity definitions in a specific format - see source `components` folder for examples.
-
-* **names**  - Hash containing the component names of built-in components.
-
-* **addComponentAgain (id,name,state)** 
-
-* **isTerrainBlocked (x,y,z)** 
-
-* **setEntitySize (x,y,z)** 
-
-* **getEntitiesInAABB (box)** 
-
-* **add (position, width, height..)** 
-
-  Helper to set up a general entity, and populate with some common components depending on arguments.
-  
-  Parameters: position, width, height [, mesh, meshOffset, doPhysics, shadow]
-
-<!-- End lib/entities.js -->
-
-----
-
-<!-- Start lib/world.js -->
-
-## noa.world
-Module for managing the world, and its chunks
-
-* **getBlockID (x,y,z)** 
-
-* **getBlockSolidity (x,y,z)** 
-
-* **getBlockOpacity (x,y,z)** 
-
-* **getBlockTransparency (x,y,z)** 
-
-* **getBlockFluidity (x,y,z)** 
-
-* **getBlockProperties (x,y,z)** 
-
-* **getBlockObjectMesh (x,y,z)** 
-
-* **setBlockID (x,y,z)** 
-
-* **isBoxUnobstructed (x,y,z)** 
-
-* **setChunkData (id, array)**  - client should call this after creating a chunk's worth of data (as an ndarray) 
-
-<!-- End lib/world.js -->
-
-----
 
